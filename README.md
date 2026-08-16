@@ -2,10 +2,10 @@
 
 A full-stack invoicing system built as a take-home technical test: manage customers, create invoices, move them through their lifecycle, and watch the money on a dashboard.
 
-**Live demo:** _add your deployed links here once deployed (see [Deployment](#deployment))._
+**Live demo:** [mini-erp-web-orcin.vercel.app](https://mini-erp-web-orcin.vercel.app/) (API: [mini-erp-dm2c.onrender.com](https://mini-erp-dm2c.onrender.com/api/docs))
 
-![CI](https://img.shields.io/github/actions/workflow/status/<your-user>/slm-erp/ci.yml?branch=main&label=CI)
-![Vercel](https://img.shields.io/badge/Vercel-deployed-black?logo=vercel)
+![CI](https://img.shields.io/github/actions/workflow/status/eryzerz/mini-erp/ci.yml?branch=master&label=CI)
+[![Vercel](https://img.shields.io/badge/Vercel-deployed-black?logo=vercel)](https://mini-erp-web-orcin.vercel.app/)
 
 ## Tech stack
 
@@ -164,8 +164,8 @@ Conventions: offset pagination (`page`, `pageSize` ≤ 100) with a `{ items, pag
 
 ## Deployment
 
-- **Frontend**: Vercel (connects to the repo; auto-deploys `main`).
-- **API**: Render, Docker deployment using `apps/api/Dockerfile` (entrypoint runs migrations + seed on release).
+- **Frontend**: Vercel — [mini-erp-web-orcin.vercel.app](https://mini-erp-web-orcin.vercel.app/) (connects to the repo; auto-deploys `master`).
+- **API**: Render — [mini-erp-dm2c.onrender.com](https://mini-erp-dm2c.onrender.com/api/docs), Docker deployment using `apps/api/Dockerfile` (entrypoint runs migrations + seed on release).
 - **Database**: Neon (Postgres 16), free tier.
 
 Environment variables live in each platform's dashboard — never in the repo:
