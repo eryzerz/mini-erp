@@ -10,6 +10,7 @@ import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogFo
 import type { CustomerDto } from "@repo/contracts";
 
 import { useCreateCustomer, useUpdateCustomer } from "@/lib/queries";
+import { formatPhone, formatTaxId } from "@/lib/format";
 
 const customerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -130,7 +131,13 @@ export function CustomerDialog({
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="+62 21 555 0134" {...field} />
+                      <Input
+                        placeholder="+62 21 555 0134"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        {...field}
+                        onChange={(event) => field.onChange(formatPhone(event.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,7 +151,13 @@ export function CustomerDialog({
                 <FormItem>
                   <FormLabel>Tax ID (NPWP)</FormLabel>
                   <FormControl>
-                    <Input placeholder="01.234.567.8-901.000" {...field} />
+                    <Input
+                      placeholder="01.234.567.8-901.000"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      {...field}
+                      onChange={(event) => field.onChange(formatTaxId(event.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
