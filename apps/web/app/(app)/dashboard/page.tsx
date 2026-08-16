@@ -17,7 +17,6 @@ const PERIODS = [
   { label: "All time", from: undefined },
   { label: "60 days", from: "60" },
   { label: "180 days", from: "180" },
-  { label: "6 months", from: "180" },
 ];
 
 export default function DashboardPage(): React.ReactElement {
