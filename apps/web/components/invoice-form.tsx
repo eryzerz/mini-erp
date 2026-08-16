@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button, Card, CardContent, CardHeader, CardTitle, FormField, FormSelectField, Input, SelectItem, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 import type { InvoiceDto } from "@repo/contracts";
 
 import { AmountText } from "@/components/amount-text";
@@ -28,7 +28,7 @@ const invoiceSchema = z.object({
 
 type InvoiceValues = z.infer<typeof invoiceSchema>;
 
-export const InvoiceForm = ({ invoice }: { invoice?: InvoiceDto }): React.ReactElement => {
+export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
   const router = useRouter();
   const { data: customers } = useCustomers({ pageSize: 100 });
   const createMutation = useCreateInvoice();
@@ -83,13 +83,12 @@ export const InvoiceForm = ({ invoice }: { invoice?: InvoiceDto }): React.ReactE
       if (invoice) {
         await updateMutation.mutateAsync({ id: invoice.id, data: payload });
         toast.success("Draft updated");
+        router.push(`/invoices/${invoice.id}`);
       } else {
         const created = await createMutation.mutateAsync(payload);
         toast.success("Draft invoice created");
         router.push(`/invoices/${created.id}`);
-        return;
       }
-      router.push(`/invoices/${invoice.id}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to save invoice");
     } finally {
@@ -98,106 +97,175 @@ export const InvoiceForm = ({ invoice }: { invoice?: InvoiceDto }): React.ReactE
   });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Details</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <FormSelectField<InvoiceValues, string> control={form.control} name="customerId" label="Customer" placeholder="Select a customer">
-            {(customers?.items ?? []).map((customer) => (
-              <SelectItem key={customer.id} value={customer.id}>
-                {customer.name}
-              </SelectItem>
-            ))}
-          </FormSelectField>
-          <FormField<InvoiceValues, string> control={form.control} name="dueDate" label="Due date">
-            {(field) => <Input id="dueDate" type="date" {...field} />}
-          </FormField>
-        </CardContent>
-      </Card>
+    <Form {...form}>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Details</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="customerId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Customer</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a customer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(customers?.items ?? []).map((customer) => (
+                          <SelectItem key={customer.id} value={customer.id}>
+                            {customer.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due date</FormLabel>
+                  <FormControl>
+                    <DatePicker id="dueDate" value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-base">Items</CardTitle>
-          <Button type="button" variant="outline" size="sm" onClick={() => append({ description: "", quantity: "1", unitPrice: "", taxRate: "11.00" })}>
-            <Plus /> Add item
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[40%]">Description</TableHead>
-                <TableHead className="w-20">Qty</TableHead>
-                <TableHead className="w-28">Unit price</TableHead>
-                <TableHead className="w-24">PPN</TableHead>
-                <TableHead className="w-16" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {fields.map((field, index) => (
-                <TableRow key={field.id}>
-                  <TableCell>
-                    <FormField<InvoiceValues, string> control={form.control} name={`items.${index}.description`}>
-                      {(input) => <Input placeholder="Service or product" {...input} />}
-                    </FormField>
-                  </TableCell>
-                  <TableCell>
-                    <FormField<InvoiceValues, string> control={form.control} name={`items.${index}.quantity`}>
-                      {(input) => <Input {...input} />}
-                    </FormField>
-                  </TableCell>
-                  <TableCell>
-                    <FormField<InvoiceValues, string> control={form.control} name={`items.${index}.unitPrice`}>
-                      {(input) => <Input placeholder="0" {...input} />}
-                    </FormField>
-                  </TableCell>
-                  <TableCell>
-                    <FormSelectField<InvoiceValues, string> control={form.control} name={`items.${index}.taxRate`}>
-                      <SelectItem value="0.00">0%</SelectItem>
-                      <SelectItem value="11.00">11%</SelectItem>
-                    </FormSelectField>
-                  </TableCell>
-                  <TableCell>
-                    <Button type="button" variant="ghost" size="icon" aria-label="Remove item" onClick={() => remove(index)} disabled={fields.length === 1}>
-                      <Trash2 />
-                    </Button>
-                  </TableCell>
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base">Items</CardTitle>
+            <Button type="button" variant="outline" size="sm" onClick={() => append({ description: "", quantity: "1", unitPrice: "", taxRate: "11.00" })}>
+              <Plus /> Add item
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Description</TableHead>
+                  <TableHead className="w-20">Qty</TableHead>
+                  <TableHead className="w-28">Unit price</TableHead>
+                  <TableHead className="w-24">PPN</TableHead>
+                  <TableHead className="w-16" />
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {form.formState.errors.items ? (
-            <p className="text-xs text-destructive">{String(form.formState.errors.items.message ?? "Fix the items above")}</p>
-          ) : null}
+              </TableHeader>
+              <TableBody>
+                {fields.map((field, index) => (
+                  <TableRow key={field.id}>
+                    <TableCell>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input placeholder="Service or product" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.quantity`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.unitPrice`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input placeholder="0" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.taxRate`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0.00">0%</SelectItem>
+                                  <SelectItem value="11.00">11%</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button type="button" variant="ghost" size="icon" aria-label="Remove item" onClick={() => remove(index)} disabled={fields.length === 1}>
+                        <Trash2 />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-          <div className="ml-auto w-full max-w-xs space-y-1 border-t pt-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <AmountText value={totals.subtotal.toFixed(2)} />
+            <div className="ml-auto w-full max-w-xs space-y-1 border-t pt-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                <AmountText value={totals.subtotal.toFixed(2)} />
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Tax (PPN)</span>
+                <AmountText value={totals.tax.toFixed(2)} />
+              </div>
+              <div className="flex justify-between border-t pt-1 text-base font-semibold">
+                <span>Total</span>
+                <AmountText value={(totals.subtotal + totals.tax).toFixed(2)} />
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tax (PPN)</span>
-              <AmountText value={totals.tax.toFixed(2)} />
-            </div>
-            <div className="flex justify-between border-t pt-1 text-base font-semibold">
-              <span>Total</span>
-              <AmountText value={(totals.subtotal + totals.tax).toFixed(2)} />
-            </div>
-          </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => router.push(invoice ? `/invoices/${invoice.id}` : "/invoices")}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? <Loader2 className="animate-spin" /> : null}
-              {invoice ? "Save changes" : "Save draft"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </form>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => router.push(invoice ? `/invoices/${invoice.id}` : "/invoices")}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? <Loader2 className="animate-spin" /> : null}
+                {invoice ? "Save changes" : "Save draft"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
   );
-};
+}

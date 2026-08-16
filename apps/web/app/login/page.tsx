@@ -3,10 +3,10 @@
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Card, CardContent, CardDescription, CardHeader, Input, Label } from "@repo/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Button, Card, CardContent, CardDescription, CardHeader, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from "@repo/ui";
 
 import { useSession } from "@/lib/session";
 
@@ -17,17 +17,13 @@ const loginSchema = z.object({
 
 type LoginValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage(): React.ReactElement {
+export default function LoginPage() {
   const { user, login } = useSession();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+  const form = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
 
   useEffect(() => {
     if (user) {
@@ -35,7 +31,7 @@ export default function LoginPage(): React.ReactElement {
     }
   }, [user, router]);
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true);
     setError(null);
     try {
@@ -58,51 +54,45 @@ export default function LoginPage(): React.ReactElement {
           <CardDescription>Sign in to the invoicing system</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@slm.local"
-                autoComplete="email"
-                aria-invalid={errors.email ? true : undefined}
-                aria-describedby={errors.email ? "login-email-error" : undefined}
-                {...register("email")}
+          <Form {...form}>
+            <form onSubmit={onSubmit} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="admin@slm.local" autoComplete="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.email ? (
-                <p id="login-email-error" className="text-xs text-destructive">
-                  {errors.email.message}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" autoComplete="current-password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {error ? (
+                <p role="alert" className="text-sm text-destructive">
+                  {error}
                 </p>
               ) : null}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                aria-invalid={errors.password ? true : undefined}
-                aria-describedby={errors.password ? "login-password-error" : undefined}
-                {...register("password")}
-              />
-              {errors.password ? (
-                <p id="login-password-error" className="text-xs text-destructive">
-                  {errors.password.message}
-                </p>
-              ) : null}
-            </div>
-            {error ? (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            ) : null}
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? <Loader2 className="animate-spin" /> : null}
-              Sign in
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? <Loader2 className="animate-spin" /> : null}
+                Sign in
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

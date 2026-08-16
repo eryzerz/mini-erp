@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, FormField, Input, Textarea } from "@repo/ui";
+import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Textarea } from "@repo/ui";
 import type { CustomerDto } from "@repo/contracts";
 
 import { useCreateCustomer, useUpdateCustomer } from "@/lib/queries";
@@ -22,13 +22,13 @@ const customerSchema = z.object({
 
 type CustomerValues = z.infer<typeof customerSchema>;
 
-export const CustomerDialog = ({
+export function CustomerDialog({
   customer,
   trigger,
 }: {
   customer?: CustomerDto;
   trigger: React.ReactNode;
-}): React.ReactElement => {
+}) {
   const [open, setOpen] = useState(false);
   const createMutation = useCreateCustomer();
   const updateMutation = useUpdateCustomer();
@@ -94,42 +94,104 @@ export const CustomerDialog = ({
           <DialogTitle>{customer ? "Edit customer" : "New customer"}</DialogTitle>
           <DialogDescription>{customer ? "Update the customer's details." : "Add a customer to invoice."}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <FormField control={form.control} name="name" label="Name">
-            {(field) => <Input id="name" placeholder="PT Maju Jaya" {...field} />}
-          </FormField>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField control={form.control} name="email" label="Email">
-              {(field) => <Input id="email" type="email" placeholder="hello@company.id" {...field} />}
-            </FormField>
-            <FormField control={form.control} name="phone" label="Phone">
-              {(field) => <Input id="phone" placeholder="+62 21 555 0134" {...field} />}
-            </FormField>
-          </div>
-          <FormField control={form.control} name="taxId" label="Tax ID (NPWP)">
-            {(field) => <Input id="taxId" placeholder="01.234.567.8-901.000" {...field} />}
-          </FormField>
-          <FormField control={form.control} name="address" label="Address">
-            {(field) => <Textarea id="address" placeholder="Jl. Sudirman Kav. 52, Jakarta" {...field} />}
-          </FormField>
-          <FormField control={form.control} name="notes" label="Notes">
-            {(field) => <Textarea id="notes" placeholder="Optional internal notes" {...field} />}
-          </FormField>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? <Loader2 className="animate-spin" /> : <Plus />}
-              {customer ? "Save changes" : "Create customer"}
-            </Button>
-          </DialogFooter>
-        </form>
-        <DialogClose className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+        <Form {...form}>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="PT Maju Jaya" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="hello@company.id" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+62 21 555 0134" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="taxId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tax ID (NPWP)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="01.234.567.8-901.000" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Jl. Sudirman Kav. 52, Jakarta" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Optional internal notes" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? <Loader2 className="animate-spin" /> : <Plus />}
+                {customer ? "Save changes" : "Create customer"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+        <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogClose>
       </DialogContent>
     </Dialog>
   );
-};
+}

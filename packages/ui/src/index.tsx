@@ -1,21 +1,23 @@
-export * from "./avatar";
-export * from "./badge";
-export * from "./button";
-export * from "./card";
-// NOTE: Chart is exported from "@repo/ui/chart" (subpath) on purpose — it is
-// the only component that pulls in recharts, and the barrel must not leak it
-// into every route's bundle.
-export * from "./cn";
-export * from "./dialog";
-export * from "./dropdown-menu";
-export * from "./empty-state";
-export * from "./form";
-export * from "./input";
-export * from "./label";
-export * from "./pagination";
-export * from "./select";
-export * from "./skeleton";
-export * from "./sonner";
-export * from "./table";
-export * from "./tabs";
-export * from "./textarea";
+export * from "./components/ui/avatar";
+export * from "./components/ui/badge";
+export * from "./components/ui/button";
+export * from "./components/ui/card";
+export * from "./components/ui/dialog";
+export * from "./components/ui/dropdown-menu";
+export * from "./components/ui/form";
+export * from "./components/ui/input";
+export * from "./components/ui/label";
+export * from "./components/ui/select";
+export * from "./components/ui/skeleton";
+export * from "./components/ui/sonner";
+export * from "./components/ui/table";
+export * from "./components/ui/tabs";
+export * from "./components/ui/textarea";
+
+// Chart is exported from "@repo/ui/chart" (subpath) on purpose — it is the only
+// component that pulls in recharts, and the barrel must not leak it into every
+// route's bundle.
+export * from "./components/date-picker";
+export * from "./components/empty-state";
+export { Pagination } from "./components/pagination-bar";
+export { cn } from "./lib/utils";
