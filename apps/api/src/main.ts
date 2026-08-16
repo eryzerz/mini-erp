@@ -47,7 +47,9 @@ async function bootstrap(): Promise<void> {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api/docs", app, document);
 
-  const port = Number(config.get<string>("PORT") ?? 4000);
+  // Render's internal health check targets port 10000, so that is the default
+  // when no PORT is provided; a service-level PORT env var overrides it.
+  const port = Number(config.get<string>("PORT") ?? 10000);
   // Bind explicitly to all interfaces: hosting platforms route to the
   // injected PORT and must reach the listener from outside the container.
   await app.listen(port, "0.0.0.0");
