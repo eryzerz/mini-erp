@@ -147,6 +147,9 @@ importers:
       sonner:
         specifier: ^2.0.1
         version: 2.0.8(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
       zod:
         specifier: ^3.24.2
         version: 3.25.76

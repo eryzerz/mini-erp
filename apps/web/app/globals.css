@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* The shared UI package lives outside the app root; Tailwind v4's automatic
+   source detection only scans the working directory, so classes used solely
+   by @repo/ui (e.g. the card padding) never compiled without this. */
+@source "../../../packages/ui/src";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
