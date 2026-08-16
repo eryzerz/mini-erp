@@ -15,7 +15,8 @@ import { useDashboard } from "@/lib/queries";
 
 const PERIODS = [
   { label: "All time", from: undefined },
-  { label: "60 days", from: "60" },
+  { label: "60", from: "60" },
+  { label: "180", from: "180" },
   { label: "6 months", from: "180" },
 ];
 
