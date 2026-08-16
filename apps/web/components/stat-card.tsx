@@ -17,7 +17,7 @@ const toneStyles: Record<NonNullable<StatCardProps["tone"]>, string> = {
 };
 
 export const StatCard = ({ label, value, sub, icon: Icon, tone = "default" }: StatCardProps): React.ReactElement => (
-  <Card>
+  <Card className="min-w-0">
     <CardContent className="flex items-start justify-between p-5">
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>

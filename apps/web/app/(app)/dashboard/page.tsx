@@ -104,7 +104,7 @@ export default function DashboardPage(): React.ReactElement {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
+            <Card className="min-w-0 lg:col-span-2">
               <CardHeader>
                 <CardTitle className="text-base">Monthly revenue</CardTitle>
               </CardHeader>
@@ -113,7 +113,7 @@ export default function DashboardPage(): React.ReactElement {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-0">
               <CardHeader>
                 <CardTitle className="text-base">By status</CardTitle>
               </CardHeader>

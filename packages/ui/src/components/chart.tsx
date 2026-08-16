@@ -32,7 +32,7 @@ export function Chart({
   };
 
   return (
-    <ChartContainer config={config} className="w-full" style={{ height }}>
+    <ChartContainer config={config} className="w-full min-w-0" style={{ height }}>
       <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis dataKey={xKey} tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
