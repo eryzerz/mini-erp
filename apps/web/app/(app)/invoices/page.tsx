@@ -105,7 +105,15 @@ export default function InvoicesPage(): React.ReactElement {
                 <TableBody>
                   {data.items.map((invoice) => (
                     <TableRow key={invoice.id} className="cursor-pointer" onClick={() => router.push(`/invoices/${invoice.id}`)}>
-                      <TableCell className="font-medium">{invoice.number ?? "Draft"}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link
+                          href={`/invoices/${invoice.id}`}
+                          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm underline-offset-4 hover:underline"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {invoice.number ?? "Draft"}
+                        </Link>
+                      </TableCell>
                       <TableCell>{invoice.customer?.name}</TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(invoice.issueDate)}</TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(invoice.dueDate)}</TableCell>

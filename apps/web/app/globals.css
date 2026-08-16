@@ -30,7 +30,7 @@
   --card-foreground: 0 0% 98%;
   --popover: 240 10% 3.9%;
   --popover-foreground: 0 0% 98%;
-  --primary: 243 75% 65%;
+  --primary: 243 75% 60%;
   --primary-foreground: 0 0% 100%;
   --secondary: 240 3.7% 15.9%;
   --secondary-foreground: 0 0% 98%;
@@ -80,4 +80,40 @@
     color: hsl(var(--foreground));
     font-family: var(--font-geist-sans), system-ui, sans-serif;
   }
+}
+
+/* Respect the user's motion preference: collapse decorative animation and
+   transition durations while keeping state and feedback visible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes kf-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes kf-zoom-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes kf-slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@layer utilities {
+  .animate-fade-in { animation: kf-fade-in 0.15s ease-out; }
+  .animate-fade-out { animation: kf-fade-in 0.12s ease-in reverse; }
+  .animate-zoom-in { animation: kf-zoom-in 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
+  .animate-zoom-out { animation: kf-zoom-in 0.12s cubic-bezier(0.16, 1, 0.3, 1) reverse; }
+  .animate-slide-in-left { animation: kf-slide-in-left 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
 }

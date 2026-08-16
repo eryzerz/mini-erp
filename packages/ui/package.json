@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.tsx"
+    ".": "./src/index.tsx",
+    "./chart": "./src/chart.tsx"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",

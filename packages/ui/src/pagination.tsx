@@ -37,8 +37,10 @@ export const Pagination = ({ page, totalPages, onChange }: PaginationProps): Rea
           <button
             key={item}
             onClick={() => onChange(item)}
+            aria-label={`Page ${item}`}
+            aria-current={item === page ? "page" : undefined}
             className={cn(
-              "h-8 w-8 rounded-md text-sm transition-colors hover:bg-accent",
+              "h-11 w-11 rounded-md text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               item === page && "bg-primary text-primary-foreground hover:bg-primary",
             )}
           >

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button, Card, CardContent, CardHeader, CardTitle, FormField, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FormField, FormSelectField, Input, SelectItem, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 import type { InvoiceDto } from "@repo/contracts";
 
 import { AmountText } from "@/components/amount-text";
@@ -104,22 +104,13 @@ export const InvoiceForm = ({ invoice }: { invoice?: InvoiceDto }): React.ReactE
           <CardTitle className="text-base">Details</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <FormField<InvoiceValues, string> control={form.control} name="customerId" label="Customer">
-            {(field) => (
-              <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a customer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(customers?.items ?? []).map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </FormField>
+          <FormSelectField<InvoiceValues, string> control={form.control} name="customerId" label="Customer" placeholder="Select a customer">
+            {(customers?.items ?? []).map((customer) => (
+              <SelectItem key={customer.id} value={customer.id}>
+                {customer.name}
+              </SelectItem>
+            ))}
+          </FormSelectField>
           <FormField<InvoiceValues, string> control={form.control} name="dueDate" label="Due date">
             {(field) => <Input id="dueDate" type="date" {...field} />}
           </FormField>
@@ -163,19 +154,10 @@ export const InvoiceForm = ({ invoice }: { invoice?: InvoiceDto }): React.ReactE
                     </FormField>
                   </TableCell>
                   <TableCell>
-                    <FormField<InvoiceValues, string> control={form.control} name={`items.${index}.taxRate`}>
-                      {(input) => (
-                        <Select value={input.value} onValueChange={(value) => input.onChange(value)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="0.00">0%</SelectItem>
-                            <SelectItem value="11.00">11%</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </FormField>
+                    <FormSelectField<InvoiceValues, string> control={form.control} name={`items.${index}.taxRate`}>
+                      <SelectItem value="0.00">0%</SelectItem>
+                      <SelectItem value="11.00">11%</SelectItem>
+                    </FormSelectField>
                   </TableCell>
                   <TableCell>
                     <Button type="button" variant="ghost" size="icon" aria-label="Remove item" onClick={() => remove(index)} disabled={fields.length === 1}>

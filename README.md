@@ -35,7 +35,7 @@ pnpm dev
 
 `pnpm dev` boots PostgreSQL, applies migrations, seeds demo data (idempotent — safe to re-run), and starts both apps:
 
-- Web app: http://localhost:3000
+- Web app: http://localhost:3000 (if 3000 is busy, Next.js bumps to 3001 — add your port to `CORS_ORIGIN` in `.env`; the shipped default allows both)
 - API + Swagger docs: http://localhost:4000/api/docs
 
 ### Seeded credentials

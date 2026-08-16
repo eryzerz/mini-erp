@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from "@repo/ui";
+import { Button, Card, CardContent, CardDescription, CardHeader, Input, Label } from "@repo/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -52,24 +52,52 @@ export default function LoginPage(): React.ReactElement {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-xl">
+          <h1 className="text-xl font-semibold leading-none tracking-tight">
             SLM <span className="text-primary">ERP</span>
-          </CardTitle>
+          </h1>
           <CardDescription>Sign in to the invoicing system</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="admin@slm.local" autoComplete="email" {...register("email")} />
-              {errors.email ? <p className="text-xs text-destructive">{errors.email.message}</p> : null}
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@slm.local"
+                autoComplete="email"
+                aria-invalid={errors.email ? true : undefined}
+                aria-describedby={errors.email ? "login-email-error" : undefined}
+                {...register("email")}
+              />
+              {errors.email ? (
+                <p id="login-email-error" className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
+              ) : null}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="••••••••" autoComplete="current-password" {...register("password")} />
-              {errors.password ? <p className="text-xs text-destructive">{errors.password.message}</p> : null}
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                aria-invalid={errors.password ? true : undefined}
+                aria-describedby={errors.password ? "login-password-error" : undefined}
+                {...register("password")}
+              />
+              {errors.password ? (
+                <p id="login-password-error" className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
+              ) : null}
             </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
+            {error ? (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            ) : null}
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="animate-spin" /> : null}
               Sign in

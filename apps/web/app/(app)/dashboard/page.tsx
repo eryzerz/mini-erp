@@ -4,7 +4,8 @@ import { AlertTriangle, Banknote, Clock } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Chart, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from "@repo/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from "@repo/ui";
+import { Chart } from "@repo/ui/chart";
 
 import { AmountText } from "@/components/amount-text";
 import { StatCard } from "@/components/stat-card";

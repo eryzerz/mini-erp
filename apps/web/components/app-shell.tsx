@@ -1,10 +1,10 @@
 "use client";
 
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Moon, Sun, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Avatar,
   AvatarFallback,
@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  cn,
 } from "@repo/ui";
 
 import { useSession } from "@/lib/session";
@@ -34,14 +35,33 @@ const initials = (name: string): string =>
     .join("")
     .toUpperCase();
 
+const FOCUS_RING =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+
 export const AppShell = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const pathname = usePathname();
   const { user, logout } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+
+  // Return focus to the trigger when the drawer closes.
+  useEffect(() => {
+    if (!mobileOpen) {
+      menuButtonRef.current?.focus();
+    }
+  }, [mobileOpen]);
+
+  // Focus the drawer when it opens.
+  useEffect(() => {
+    if (mobileOpen) {
+      drawerRef.current?.focus();
+    }
+  }, [mobileOpen]);
 
   const nav = (
-    <nav className="flex flex-col gap-1 p-3">
+    <nav className="flex flex-col gap-1 p-3" aria-label="Main navigation">
       {NAV.map((item) => {
         const active = pathname.startsWith(item.href);
         return (
@@ -49,9 +69,12 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
             key={item.href}
             href={item.href}
             onClick={() => setMobileOpen(false)}
-            className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground"
-            }`}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              FOCUS_RING,
+              active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+            )}
           >
             {item.label}
           </Link>
@@ -64,7 +87,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
     <div className="flex min-h-screen">
       <aside className="hidden w-56 shrink-0 border-r bg-card md:block">
         <div className="flex h-14 items-center border-b px-4">
-          <Link href="/dashboard" className="text-sm font-semibold tracking-tight">
+          <Link href="/dashboard" className={`text-sm font-semibold tracking-tight rounded-sm ${FOCUS_RING}`}>
             SLM <span className="text-primary">ERP</span>
           </Link>
         </div>
@@ -72,13 +95,39 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
       </aside>
 
       {mobileOpen ? (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-56 border-r bg-card">
-            <div className="flex h-14 items-center border-b px-4">
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setMobileOpen(false);
+            }
+          }}
+        >
+          <button
+            className="absolute inset-0 h-full w-full cursor-default bg-black/60 animate-fade-in"
+            onClick={() => setMobileOpen(false)}
+            tabIndex={-1}
+            aria-label="Close menu"
+          />
+          <aside
+            ref={drawerRef}
+            tabIndex={-1}
+            className="absolute left-0 top-0 flex h-full w-56 flex-col border-r bg-card outline-none animate-slide-in-left"
+          >
+            <div className="flex h-14 items-center justify-between border-b px-4">
               <span className="text-sm font-semibold tracking-tight">
                 SLM <span className="text-primary">ERP</span>
               </span>
+              <button
+                className={`flex h-11 w-11 items-center justify-center rounded-sm text-muted-foreground hover:bg-accent ${FOCUS_RING}`}
+                onClick={() => setMobileOpen(false)}
+                aria-label="Close menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
             {nav}
           </aside>
@@ -87,7 +136,13 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 shrink-0 items-center justify-between border-b bg-card px-4 md:px-6">
-          <button className="rounded-md p-2 text-muted-foreground hover:bg-accent md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+          <button
+            ref={menuButtonRef}
+            className={`rounded-md p-2 text-muted-foreground hover:bg-accent md:hidden ${FOCUS_RING}`}
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
             </svg>
@@ -99,13 +154,16 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full p-1 hover:bg-accent" aria-label="User menu">
-                  <Avatar>
+                <button
+                  className={`flex items-center gap-2 rounded-full p-1 hover:bg-accent ${FOCUS_RING}`}
+                  aria-label="User menu"
+                >
+                  <Avatar className="h-10 w-10">
                     <AvatarFallback>{user ? initials(user.name) : "?"}</AvatarFallback>
                   </Avatar>
                   <div className="hidden text-left sm:block">
                     <p className="text-xs font-medium leading-tight">{user?.name}</p>
-                    <Badge variant={user?.role === "ADMIN" ? "default" : "secondary"} className="mt-0.5 h-4 px-1.5 text-[10px]">
+                    <Badge variant={user?.role === "ADMIN" ? "default" : "secondary"} className="mt-0.5 h-5 px-2 text-[11px]">
                       {user?.role}
                     </Badge>
                   </div>
