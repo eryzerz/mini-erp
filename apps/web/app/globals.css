@@ -98,6 +98,13 @@
     color: hsl(var(--foreground));
     font-family: var(--font-geist-sans), system-ui, sans-serif;
   }
+  ::selection {
+    background-color: hsl(var(--primary) / 0.18);
+  }
+  input,
+  textarea {
+    caret-color: hsl(var(--primary));
+  }
 }
 
 /* Respect the user's motion preference: collapse decorative animation and

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button, Card, CardContent, CardDescription, CardHeader, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from "@repo/ui";
+import { Button, Card, CardContent, CardDescription, CardHeader, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, PasswordInput } from "@repo/ui";
 
 import { useSession } from "@/lib/session";
 
@@ -76,7 +76,7 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" autoComplete="current-password" {...field} />
+                      <PasswordInput placeholder="••••••••" autoComplete="current-password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -93,6 +93,9 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+          <p className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground">
+            Demo account · admin@slm.local / admin123
+          </p>
         </CardContent>
       </Card>
     </div>
