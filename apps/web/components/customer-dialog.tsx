@@ -10,7 +10,7 @@ import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogFo
 import type { CustomerDto } from "@repo/contracts";
 
 import { useCreateCustomer, useUpdateCustomer } from "@/lib/queries";
-import { formatPhone, formatTaxId } from "@/lib/format";
+import { formatPhone, formatTaxId } from "@repo/common/format";
 
 const customerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),

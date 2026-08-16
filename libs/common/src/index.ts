@@ -1,3 +1,4 @@
+export * from "./format";
 export * from "./jwt-auth.guard";
 export * from "./money";
 export * from "./pagination";

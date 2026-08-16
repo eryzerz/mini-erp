@@ -12,7 +12,8 @@
     "./money": {
       "types": "./dist/money.d.ts",
       "default": "./dist/money.js"
-    }
+    },
+    "./format": "./src/format.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
