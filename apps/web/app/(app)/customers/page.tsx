@@ -4,7 +4,8 @@ import { Plus, Search, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDeferredValue, useState } from "react";
 import { toast } from "sonner";
-import { Button, Card, CardContent, EmptyState, Input, Pagination, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, Button, Card, CardContent, EmptyState, Input, Pagination, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import type { CustomerDto } from "@repo/contracts";
 import { useSession } from "@/lib/session";
 
 import { CustomerDialog } from "@/components/customer-dialog";
@@ -22,6 +23,7 @@ export default function CustomersPage(): React.ReactElement {
 
   const { data, isLoading } = useCustomers({ page, search: deferredSearch || undefined });
   const deleteMutation = useDeleteCustomer();
+  const [deleteTarget, setDeleteTarget] = useState<CustomerDto | null>(null);
 
   const updateQuery = (updates: Record<string, string | undefined>): void => {
     const params = new URLSearchParams(searchParams.toString());
@@ -36,11 +38,12 @@ export default function CustomersPage(): React.ReactElement {
     router.replace(`/customers${str ? `?${str}` : ""}`);
   };
 
-  const onDelete = async (id: string, name: string): Promise<void> => {
-    if (!window.confirm(`Delete customer "${name}"? This cannot be undone.`)) return;
+  const confirmDelete = async (): Promise<void> => {
+    if (!deleteTarget) return;
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync(deleteTarget.id);
       toast.success("Customer deleted");
+      setDeleteTarget(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete customer");
     }
@@ -112,7 +115,7 @@ export default function CustomersPage(): React.ReactElement {
                             trigger={<Button variant="ghost" size="sm">Edit</Button>}
                           />
                           {user?.role === "ADMIN" ? (
-                            <Button variant="ghost" size="icon" aria-label={`Delete ${customer.name}`} onClick={() => void onDelete(customer.id, customer.name)}>
+                            <Button variant="ghost" size="icon" aria-label={`Delete ${customer.name}`} onClick={() => setDeleteTarget(customer)}>
                               <Trash2 className="text-destructive" />
                             </Button>
                           ) : null}
@@ -135,6 +138,31 @@ export default function CustomersPage(): React.ReactElement {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete customer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-medium text-foreground">{deleteTarget?.name}</span> will be permanently
+              removed, along with its draft invoices. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={(event) => {
+                event.preventDefault();
+                void confirmDelete();
+              }}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
