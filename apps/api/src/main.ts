@@ -48,7 +48,9 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup("api/docs", app, document);
 
   const port = Number(config.get<string>("PORT") ?? 4000);
-  await app.listen(port);
+  // Bind explicitly to all interfaces: hosting platforms route to the
+  // injected PORT and must reach the listener from outside the container.
+  await app.listen(port, "0.0.0.0");
 }
 
 void bootstrap();

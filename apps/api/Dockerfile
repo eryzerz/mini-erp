@@ -25,5 +25,7 @@ COPY --from=builder /app/nest-cli.json ./nest-cli.json
 
 RUN chmod +x /app/apps/api/docker-entrypoint.sh
 
-EXPOSE 4000
+# No EXPOSE: the app listens on the platform-injected PORT. Declaring a port
+# here can make Render route health checks to a fixed port nothing listens on.
+
 ENTRYPOINT ["/app/apps/api/docker-entrypoint.sh"]
