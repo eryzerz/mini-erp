@@ -107,7 +107,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
           }}
         >
           <button
-            className="absolute inset-0 h-full w-full cursor-default bg-black/60 animate-fade-in"
+            className="absolute inset-0 h-full w-full cursor-default bg-black/85 animate-fade-in"
             onClick={() => setMobileOpen(false)}
             tabIndex={-1}
             aria-label="Close menu"
