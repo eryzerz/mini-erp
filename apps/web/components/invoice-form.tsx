@@ -194,7 +194,18 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input inputMode="decimal" {...field} />
+                              <Input
+                                inputMode="decimal"
+                                {...field}
+                                onBeforeInput={(event) => {
+                                  const inserted = (event.nativeEvent as InputEvent).data;
+                                  if (inserted == null) return;
+                                  const next = `${event.currentTarget.value}${inserted}`;
+                                  if (!/^\d*\.?\d*$/.test(next)) {
+                                    event.preventDefault();
+                                  }
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
