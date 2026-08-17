@@ -20,6 +20,7 @@ export * from "./components/ui/textarea";
 // component that pulls in recharts, and the barrel must not leak it into every
 // route's bundle.
 export * from "./components/date-picker";
+export * from "./components/currency-input";
 export * from "./components/empty-state";
 export { Pagination } from "./components/pagination-bar";
 export { cn } from "./lib/utils";

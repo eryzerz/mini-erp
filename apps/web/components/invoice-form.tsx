@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CurrencyInput, DatePicker, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 import type { InvoiceDto } from "@repo/contracts";
 
 import { AmountText } from "@/components/amount-text";
@@ -208,7 +208,7 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input placeholder="0" inputMode="decimal" {...field} />
+                              <CurrencyInput placeholder="Rp 0" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
