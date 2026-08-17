@@ -26,9 +26,19 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          // Solid white toasts in every theme; the icon carries the
+          // semantic color.
+          "--normal-bg": "#ffffff",
+          "--normal-text": "#09090b",
+          "--normal-border": "hsl(var(--border))",
+          "--success-bg": "#ffffff",
+          "--success-text": "#09090b",
+          "--error-bg": "#ffffff",
+          "--error-text": "#09090b",
+          "--info-bg": "#ffffff",
+          "--info-text": "#09090b",
+          "--warning-bg": "#ffffff",
+          "--warning-text": "#09090b",
           "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }
