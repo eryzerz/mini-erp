@@ -1,6 +1,6 @@
 import type { CurrencyCode, InvoiceDto } from "@repo/contracts";
 import { InvoiceStatus } from "@repo/contracts";
-import { computeLineSubtotal } from "@repo/common";
+import { computeLineSubtotal, trimTrailingZeros } from "@repo/common";
 import type { Invoice, InvoiceItem, InvoiceStatusChange } from "@repo/prisma";
 
 export const moneyString = (value: { toFixed: (digits: number) => string }): string =>
@@ -37,8 +37,8 @@ export const toInvoiceDto = (invoice: InvoiceWithRelations): InvoiceDto => {
       .map((item) => ({
         id: item.id,
         description: item.description,
-        quantity: item.quantity.toFixed(4),
-        unitPrice: item.unitPrice.toFixed(4),
+        quantity: trimTrailingZeros(item.quantity.toFixed(4)),
+        unitPrice: trimTrailingZeros(item.unitPrice.toFixed(4)),
         taxRate: item.taxRate.toFixed(2),
         // Lines are rounded to 2 dp before summing, so the displayed line
         // totals always add up to the invoice total.

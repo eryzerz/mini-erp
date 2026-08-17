@@ -52,3 +52,11 @@ export const formatTaxId = (input: string): string => {
   }
   return out;
 };
+
+/**
+ * Strip trailing zeros from a fixed-point decimal string, e.g.
+ * "1.0000" -> "1", "2.5000" -> "2.5", "0.7500" -> "0.75".
+ * Display-only — storage keeps its declared precision.
+ */
+export const trimTrailingZeros = (value: string): string =>
+  value.includes(".") ? value.replace(/\.?0+$/, "") : value;

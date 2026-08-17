@@ -194,7 +194,7 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input {...field} />
+                              <Input inputMode="decimal" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -208,7 +208,7 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input placeholder="0" {...field} />
+                              <Input placeholder="0" inputMode="decimal" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
