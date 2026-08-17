@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, Badge, Button, Card, CardContent, CardHeader, CardTitle, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 
 import { AmountText } from "@/components/amount-text";
 import { StatusBadge } from "@/components/status-badge";
@@ -21,13 +21,14 @@ export default function InvoiceDetailPage(): React.ReactElement {
   const actionMutation = useInvoiceAction();
   const deleteMutation = useDeleteInvoice();
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<"send" | "cancel" | "delete" | null>(null);
 
-  const runAction = async (action: "send" | "mark-paid" | "cancel", confirmText?: string): Promise<void> => {
-    if (confirmText && !window.confirm(confirmText)) return;
+  const runAction = async (action: "send" | "mark-paid" | "cancel"): Promise<void> => {
     setPendingAction(action);
     try {
       await actionMutation.mutateAsync({ id: params.id, action });
       toast.success(action === "send" ? "Invoice sent" : action === "mark-paid" ? "Invoice marked as paid" : "Invoice cancelled");
+      setConfirmAction(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Action failed");
     } finally {
@@ -36,14 +37,38 @@ export default function InvoiceDetailPage(): React.ReactElement {
   };
 
   const onDelete = async (): Promise<void> => {
-    if (!window.confirm("Delete this draft invoice? This cannot be undone.")) return;
     try {
       await deleteMutation.mutateAsync(params.id);
       toast.success("Invoice deleted");
+      setConfirmAction(null);
       router.push("/invoices");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete invoice");
     }
+  };
+
+  const confirmCopy: Record<NonNullable<typeof confirmAction>, { title: string; description: string; actionLabel: string; destructive: boolean; busyLabel: string }> = {
+    send: {
+      title: "Send invoice?",
+      description: "The invoice number is assigned now and the draft is frozen — it can no longer be edited.",
+      actionLabel: "Send",
+      destructive: false,
+      busyLabel: "Sending…",
+    },
+    cancel: {
+      title: "Cancel invoice?",
+      description: "The invoice stays on record with its status history.",
+      actionLabel: "Cancel invoice",
+      destructive: true,
+      busyLabel: "Cancelling…",
+    },
+    delete: {
+      title: "Delete draft invoice?",
+      description: "This draft will be permanently removed. This cannot be undone.",
+      actionLabel: "Delete",
+      destructive: true,
+      busyLabel: "Deleting…",
+    },
   };
 
   if (isLoading) {
@@ -96,14 +121,14 @@ export default function InvoiceDetailPage(): React.ReactElement {
                   <Pencil /> Edit
                 </Link>
               </Button>
-              <Button onClick={() => void runAction("send")} disabled={pendingAction !== null}>
+              <Button onClick={() => setConfirmAction("send")} disabled={pendingAction !== null}>
                 {pendingAction === "send" ? <Loader2 className="animate-spin" /> : <Send />} Send
               </Button>
-              <Button variant="outline" onClick={() => void runAction("cancel", "Cancel this draft invoice?")} disabled={pendingAction !== null}>
+              <Button variant="outline" onClick={() => setConfirmAction("cancel")} disabled={pendingAction !== null}>
                 <XCircle /> Cancel
               </Button>
               {user?.role === "ADMIN" ? (
-                <Button variant="destructive" onClick={() => void onDelete()} disabled={pendingAction !== null}>
+                <Button variant="destructive" onClick={() => setConfirmAction("delete")} disabled={pendingAction !== null}>
                   <Trash2 /> Delete
                 </Button>
               ) : null}
@@ -115,7 +140,7 @@ export default function InvoiceDetailPage(): React.ReactElement {
               <Button onClick={() => void runAction("mark-paid")} disabled={pendingAction !== null}>
                 {pendingAction === "mark-paid" ? <Loader2 className="animate-spin" /> : null} Mark as paid
               </Button>
-              <Button variant="outline" onClick={() => void runAction("cancel", "Cancel this sent invoice?")} disabled={pendingAction !== null}>
+              <Button variant="outline" onClick={() => setConfirmAction("cancel")} disabled={pendingAction !== null}>
                 <XCircle /> Cancel invoice
               </Button>
             </>
@@ -204,6 +229,45 @@ export default function InvoiceDetailPage(): React.ReactElement {
           </CardContent>
         </Card>
       ) : null}
+
+      <AlertDialog
+        open={confirmAction !== null}
+        onOpenChange={(open) => {
+          if (!open && pendingAction === null) {
+            setConfirmAction(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmAction ? confirmCopy[confirmAction].title : ""}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction ? confirmCopy[confirmAction].description : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pendingAction !== null}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant={confirmAction ? confirmCopy[confirmAction].destructive ? "destructive" : "default" : "default"}
+              disabled={pendingAction !== null}
+              onClick={(event) => {
+                event.preventDefault();
+                if (confirmAction === "delete") {
+                  void onDelete();
+                } else if (confirmAction === "send" || confirmAction === "cancel") {
+                  void runAction(confirmAction);
+                }
+              }}
+            >
+              {pendingAction !== null && confirmAction !== null
+                ? confirmCopy[confirmAction].busyLabel
+                : confirmAction
+                  ? confirmCopy[confirmAction].actionLabel
+                  : ""}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
