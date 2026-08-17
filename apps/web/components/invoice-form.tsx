@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, type Control } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button, Card, CardContent, CardHeader, CardTitle, CurrencyInput, DatePicker, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
@@ -27,6 +27,87 @@ const invoiceSchema = z.object({
 });
 
 type InvoiceValues = z.infer<typeof invoiceSchema>;
+
+const DescriptionField = ({ control, index }: { control: Control<InvoiceValues>; index: number }) => (
+  <FormField
+    control={control}
+    name={`items.${index}.description`}
+    render={({ field }) => (
+      <FormItem>
+        <FormControl>
+          <Input placeholder="Service or product" {...field} />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const QuantityField = ({ control, index }: { control: Control<InvoiceValues>; index: number }) => (
+  <FormField
+    control={control}
+    name={`items.${index}.quantity`}
+    render={({ field }) => (
+      <FormItem>
+        <FormControl>
+          <Input
+            inputMode="decimal"
+            {...field}
+            onBeforeInput={(event) => {
+              const inserted = (event.nativeEvent as InputEvent).data;
+              if (inserted == null) return;
+              const next = `${event.currentTarget.value}${inserted}`;
+              // digits with at most one decimal point, and no leading zero
+              // before another digit (0, 0.5 are fine).
+              if (!/^\d*\.?\d*$/.test(next) || /^0\d/.test(next)) {
+                event.preventDefault();
+              }
+            }}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const UnitPriceField = ({ control, index }: { control: Control<InvoiceValues>; index: number }) => (
+  <FormField
+    control={control}
+    name={`items.${index}.unitPrice`}
+    render={({ field }) => (
+      <FormItem>
+        <FormControl>
+          <CurrencyInput placeholder="Rp 0" {...field} />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const TaxRateField = ({ control, index }: { control: Control<InvoiceValues>; index: number }) => (
+  <FormField
+    control={control}
+    name={`items.${index}.taxRate`}
+    render={({ field }) => (
+      <FormItem>
+        <FormControl>
+          <Select value={field.value} onValueChange={field.onChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0.00">0%</SelectItem>
+              <SelectItem value="11.00">11%</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
 
 export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
   const router = useRouter();
@@ -160,105 +241,82 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40%]">Description</TableHead>
-                  <TableHead className="w-20">Qty</TableHead>
-                  <TableHead className="w-28">Unit price</TableHead>
-                  <TableHead className="w-24">PPN</TableHead>
-                  <TableHead className="w-16" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {fields.map((field, index) => (
-                  <TableRow key={field.id}>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.description`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input placeholder="Service or product" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.quantity`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                inputMode="decimal"
-                                {...field}
-                                onBeforeInput={(event) => {
-                                  const inserted = (event.nativeEvent as InputEvent).data;
-                                  if (inserted == null) return;
-                                  const next = `${event.currentTarget.value}${inserted}`;
-                                  // digits with at most one decimal point, and no
-                                  // leading zero before another digit (0, 0.5 are fine).
-                                  if (!/^\d*\.?\d*$/.test(next) || /^0\d/.test(next)) {
-                                    event.preventDefault();
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.unitPrice`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <CurrencyInput placeholder="Rp 0" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <FormField
-                        control={form.control}
-                        name={`items.${index}.taxRate`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Select value={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="0.00">0%</SelectItem>
-                                  <SelectItem value="11.00">11%</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button type="button" variant="ghost" size="icon" aria-label="Remove item" onClick={() => remove(index)} disabled={fields.length === 1}>
-                        <Trash2 />
-                      </Button>
-                    </TableCell>
+            {/* Desktop: tabular row layout */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40%]">Description</TableHead>
+                    <TableHead className="w-20">Qty</TableHead>
+                    <TableHead className="w-28">Unit price</TableHead>
+                    <TableHead className="w-24">PPN</TableHead>
+                    <TableHead className="w-16" />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {fields.map((field, index) => (
+                    <TableRow key={field.id}>
+                      <TableCell>
+                        <DescriptionField control={form.control} index={index} />
+                      </TableCell>
+                      <TableCell>
+                        <QuantityField control={form.control} index={index} />
+                      </TableCell>
+                      <TableCell>
+                        <UnitPriceField control={form.control} index={index} />
+                      </TableCell>
+                      <TableCell>
+                        <TaxRateField control={form.control} index={index} />
+                      </TableCell>
+                      <TableCell>
+                        <Button type="button" variant="ghost" size="icon" aria-label="Remove item" onClick={() => remove(index)} disabled={fields.length === 1}>
+                          <Trash2 />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile: stacked cards with labeled fields, so the inputs get
+                real width and the value stays visible while typing. */}
+            <div className="space-y-3 md:hidden">
+              {fields.map((field, index) => (
+                <div key={field.id} className="rounded-lg border p-3">
+                  <div className="flex items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <DescriptionField control={form.control} index={index} />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Remove item"
+                      onClick={() => remove(index)}
+                      disabled={fields.length === 1}
+                      className="shrink-0"
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
+                  <div className="mt-3 grid grid-cols-[1fr_2fr_1fr] gap-2">
+                    <div className="min-w-0">
+                      <p className="mb-1 text-xs text-muted-foreground">Qty</p>
+                      <QuantityField control={form.control} index={index} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="mb-1 text-xs text-muted-foreground">Unit price</p>
+                      <UnitPriceField control={form.control} index={index} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="mb-1 text-xs text-muted-foreground">PPN</p>
+                      <TaxRateField control={form.control} index={index} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <div className="ml-auto w-full max-w-xs space-y-1 border-t pt-3 text-sm">
               <div className="flex justify-between">
