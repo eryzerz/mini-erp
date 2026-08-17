@@ -201,7 +201,9 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
                                   const inserted = (event.nativeEvent as InputEvent).data;
                                   if (inserted == null) return;
                                   const next = `${event.currentTarget.value}${inserted}`;
-                                  if (!/^\d*\.?\d*$/.test(next)) {
+                                  // digits with at most one decimal point, and no
+                                  // leading zero before another digit (0, 0.5 are fine).
+                                  if (!/^\d*\.?\d*$/.test(next) || /^0\d/.test(next)) {
                                     event.preventDefault();
                                   }
                                 }}
