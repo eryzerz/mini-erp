@@ -15,8 +15,9 @@ export class UsersService {
     email: string;
     name: string;
     role: UserDto["role"];
+    createdAt: Date;
   }): UserDto {
-    return { id: user.id, email: user.email, name: user.name, role: user.role };
+    return { id: user.id, email: user.email, name: user.name, role: user.role, createdAt: user.createdAt.toISOString() };
   }
 
   async findAll(

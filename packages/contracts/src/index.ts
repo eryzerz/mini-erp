@@ -29,6 +29,7 @@ export interface UserDto {
   email: string;
   name: string;
   role: UserRole;
+  createdAt: string;
 }
 
 export interface CustomerDto {

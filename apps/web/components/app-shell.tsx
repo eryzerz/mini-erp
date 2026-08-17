@@ -24,6 +24,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/customers", label: "Customers" },
   { href: "/invoices", label: "Invoices" },
+  { href: "/users", label: "Users", adminOnly: true },
 ];
 
 const initials = (name: string): string =>
@@ -62,7 +63,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }): React.Rea
 
   const nav = (
     <nav className="flex flex-col gap-1 p-3" aria-label="Main navigation">
-      {NAV.map((item) => {
+      {NAV.filter((item) => !item.adminOnly || user?.role === "ADMIN").map((item) => {
         const active = pathname.startsWith(item.href);
         return (
           <Link

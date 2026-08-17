@@ -28,8 +28,9 @@ export class AuthService {
     email: string;
     name: string;
     role: UserRole;
+    createdAt: Date;
   }): UserDto {
-    return { id: user.id, email: user.email, name: user.name, role: user.role };
+    return { id: user.id, email: user.email, name: user.name, role: user.role, createdAt: user.createdAt.toISOString() };
   }
 
   private async issueTokens(user: {
@@ -38,6 +39,7 @@ export class AuthService {
     name: string;
     role: UserRole;
     companyId: string;
+    createdAt: Date;
   }): Promise<LoginResponse> {
     const accessToken = await this.jwt.signAsync(
       { sub: user.id, email: user.email, role: user.role, companyId: user.companyId },
