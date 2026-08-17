@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 import type { InvoiceDto } from "@repo/contracts";
 
 import { AmountText } from "@/components/amount-text";
@@ -111,18 +111,26 @@ export function InvoiceForm({ invoice }: { invoice?: InvoiceDto }) {
                 <FormItem>
                   <FormLabel>Customer</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a customer" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(customers?.items ?? []).map((customer) => (
-                          <SelectItem key={customer.id} value={customer.id}>
-                            {customer.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {/* The Select must mount with its items already present:
+                        Radix cannot display a value that matches no rendered
+                        item, so while customers are still loading (e.g. when
+                        editing) the trigger would stick on the placeholder. */}
+                    {customers ? (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a customer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {customers.items.map((customer) => (
+                            <SelectItem key={customer.id} value={customer.id}>
+                              {customer.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Skeleton className="h-9 w-full" />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
