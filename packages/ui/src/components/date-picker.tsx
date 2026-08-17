@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -18,7 +18,14 @@ interface DatePickerProps {
 
 export function DatePicker({ id, value, placeholder = "Pick a date", onChange }: DatePickerProps) {
   const [open, setOpen] = useState(false);
+  const [timeZone, setTimeZone] = useState<string | undefined>(undefined);
   const date = value ? new Date(`${value}T00:00:00`) : undefined;
+
+  // The timezone is detected client-side so the calendar selects and
+  // highlights dates in the user's local timezone, and so SSR never sees it.
+  useEffect(() => {
+    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -34,6 +41,7 @@ export function DatePicker({ id, value, placeholder = "Pick a date", onChange }:
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
+          mode="single"
           selected={date}
           onSelect={(selected: Date | undefined) => {
             if (selected) {
@@ -43,6 +51,7 @@ export function DatePicker({ id, value, placeholder = "Pick a date", onChange }:
               setOpen(false);
             }
           }}
+          timeZone={timeZone}
           weekStartsOn={1}
           autoFocus
         />
