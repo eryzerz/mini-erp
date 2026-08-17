@@ -37,10 +37,13 @@ export function DatePicker({ id, value, placeholder = "Pick a date", onChange }:
           selected={date}
           onSelect={(selected: Date | undefined) => {
             if (selected) {
-              onChange(selected.toISOString().slice(0, 10));
+              // Local date, not UTC: toISOString() would shift the day back
+              // for timezones east of UTC (e.g. WIB, UTC+7).
+              onChange(format(selected, "yyyy-MM-dd"));
               setOpen(false);
             }
           }}
+          weekStartsOn={1}
           autoFocus
         />
       </PopoverContent>
